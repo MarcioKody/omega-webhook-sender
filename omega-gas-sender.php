@@ -68,11 +68,11 @@ function send_to_gas()
 
 add_action('admin_menu', function () {
     add_options_page(
-        'Omega GAS Sender',        // Tytuł strony
-        'Omega GAS Sender',        // Nazwa w menu
-        'manage_options',         // Uprawnienia
-        'omega-gas-sender',        // Slug
-        'omega_gas_sender_settings_page' // Callback
+        'Omega GAS Sender',    
+        'Omega GAS Sender',    
+        'manage_options',      
+        'omega-gas-sender',       
+        'omega_gas_sender_settings_page' 
     );
 });
 

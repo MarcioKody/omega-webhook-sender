@@ -5,6 +5,8 @@
  * Description: Allows to send Contact Form 7 Form data asynchronously to webhook
  * Version: 1.0
  * Author: Marcin Hopa
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 add_action('wp_ajax_send_to_gas', 'send_to_gas');

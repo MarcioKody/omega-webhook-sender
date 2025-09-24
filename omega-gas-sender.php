@@ -33,34 +33,43 @@ function enqueue_omega_gas_sender()
 
 function send_to_gas()
 {
-    $nonce = $_POST['nonce'];
-    if (!wp_verify_nonce($nonce, 'ogs-ajax-nonce')) {
-        wp_send_json_error("Nonce verification failed");
-    }
-
-    if (!empty($_POST)) {
-
-        $gas_url = get_option('omega_gas_sender_webhook_url');
-        if (!$gas_url) {
-            wp_send_json_error("Brak skonfigurowanego webhooka GAS w ustawieniach");
+    try {
+        $nonce = $_POST['nonce'];
+        if (!wp_verify_nonce($nonce, 'ogs-ajax-nonce')) {
+            throw new \Exception("Nonce verification failed");
         }
 
-        // Odbieramy dane z AJAX
-        $data = $_POST;
+        if (!empty($_POST)) {
 
-        // Wysyłamy dalej do GAS
+            $gas_url = get_option('omega_gas_sender_webhook_url');
+            if (!$gas_url) {
+                throw new \Exception("Brak skonfigurowanego webhooka GAS w ustawieniach");
+            }
+
+            // Odbieramy dane z AJAX
+            $data = $_POST;
+
+            // Wysyłamy dalej do GAS
+            $response = wp_remote_post($gas_url, array(
+                'body'    => json_encode($data),
+                'headers' => ['Content-Type' => 'application/json; charset=utf-8'],
+                'timeout' => 300,
+            ));
+
+            if (is_wp_error($response)) {
+                throw new \Exception($response->get_error_message());
+            }
+        } else {
+            throw new \Exception("Brak obiektu POST");
+        }
+    } catch (\Throwable $e) {
+        $gas_url = get_option('omega_gas_sender_webhook_url');
+
         $response = wp_remote_post($gas_url, array(
-            'body'    => json_encode($data),
+            'body'    => json_encode(["error_message" => $e->getMessage()]),
+            'headers' => ['Content-Type' => 'application/json; charset=utf-8'],
             'timeout' => 300,
         ));
-
-        if (is_wp_error($response)) {
-            wp_send_json_error($response->get_error_message());
-        } else {
-            wp_send_json_success(wp_remote_retrieve_body($response));
-        }
-    } else {
-        wp_send_json_error("Brak obiektu POST");
     }
 }
 
@@ -68,11 +77,11 @@ function send_to_gas()
 
 add_action('admin_menu', function () {
     add_options_page(
-        'Omega GAS Sender',    
-        'Omega GAS Sender',    
-        'manage_options',      
-        'omega-gas-sender',       
-        'omega_gas_sender_settings_page' 
+        'Omega GAS Sender',
+        'Omega GAS Sender',
+        'manage_options',
+        'omega-gas-sender',
+        'omega_gas_sender_settings_page'
     );
 });
 

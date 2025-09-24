@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Plugin Name: Omega GAS Sender
- * Description: Przekierowuje dane z formularza CF7 przez WordPress AJAX do Google Apps Script.
+ * Plugin Name: Omega CF7 AJAX Webhook Sender
+ * Description: Allows to send Contact Form 7 Form data asynchronously to webhook
  * Version: 1.0
  * Author: Marcin Hopa
  */
 
 add_action('wp_ajax_send_to_gas', 'send_to_gas');
-add_action('wp_ajax_nopriv_send_to_gas', 'send_to_gas'); // dla niezalogowanych
+add_action('wp_ajax_nopriv_send_to_gas', 'send_to_gas'); 
 
 add_action('wp_enqueue_scripts', 'enqueue_omega_gas_sender');
 
@@ -46,10 +46,8 @@ function send_to_gas()
                 throw new \Exception("Brak skonfigurowanego webhooka GAS w ustawieniach");
             }
 
-            // Odbieramy dane z AJAX
             $data = $_POST;
 
-            // Wysyłamy dalej do GAS
             $response = wp_remote_post($gas_url, array(
                 'body'    => json_encode($data),
                 'headers' => ['Content-Type' => 'application/json; charset=utf-8'],

@@ -70,6 +70,8 @@ function send_to_gas()
             'headers' => ['Content-Type' => 'application/json; charset=utf-8'],
             'timeout' => 300,
         ));
+
+        throw $e;
     }
 }
 

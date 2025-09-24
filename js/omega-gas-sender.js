@@ -23,6 +23,8 @@ document.addEventListener('wpcf7mailsent', function (event) {
             `${omega_gas_sender_obj.ajaxurl}?action=send_to_gas`,
             formData
         );
+
+        throw e;
     }
 
     function safeSend(url, formData) {

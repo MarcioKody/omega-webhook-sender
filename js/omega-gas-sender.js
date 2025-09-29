@@ -1,12 +1,14 @@
 
-function OGSsafeSend(url, formData) {
+function OGSsafeSend(url, params) {
     if (navigator.sendBeacon) {
-        navigator.sendBeacon(url, formData);
+        navigator.sendBeacon(url, params);
     } else {
         fetch(url, {
             method: 'POST',
-            body: formData,
-            keepalive: true
+            body: params,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            keepalive: true,
+            credentials: 'same-origin'
         });
     }
 }
@@ -14,24 +16,29 @@ function OGSsafeSend(url, formData) {
 document.addEventListener('wpcf7mailsent', function (event) {
 
     try {
-        let formData = new FormData();
+        let params = new URLSearchParams();
+        
         event.detail.inputs.forEach(input => {
-            formData.append(input.name, input.value);
+            params.append(input.name, input.value);
         });
 
+        params.append('nonce', omega_gas_sender_obj.nonce);
+        params.append('action', 'send_to_gas');
+
         OGSsafeSend(
-            `${omega_gas_sender_obj.ajaxurl}?action=send_to_gas&nonce=${omega_gas_sender_obj.nonce}`,
-            formData
+            `${omega_gas_sender_obj.ajaxurl}`,
+            params
         );
     }
     catch (e) {
-        let formData = new FormData();
+        let params = new URLSearchParams();
 
-        formData.append('error', e.message ?? "Wystąpił błąd");
+        params.append('error', e.message ?? "Wystąpił błąd");
+        params.append('action', 'send_to_gas');
 
         OGSsafeSend(
-            `${omega_gas_sender_obj.ajaxurl}?action=send_to_gas`,
-            formData
+            `${omega_gas_sender_obj.ajaxurl}`,
+            params
         );
 
         throw e;

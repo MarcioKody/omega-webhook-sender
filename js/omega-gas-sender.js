@@ -19,10 +19,8 @@ document.addEventListener('wpcf7mailsent', function (event) {
             formData.append(input.name, input.value);
         });
 
-        formData.append('nonce', omega_gas_sender_obj.nonce);
-
         OGSsafeSend(
-            `${omega_gas_sender_obj.ajaxurl}?action=send_to_gas`,
+            `${omega_gas_sender_obj.ajaxurl}?action=send_to_gas&nonce=${omega_gas_sender_obj.nonce}`,
             formData
         );
     }
